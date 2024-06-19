@@ -21,7 +21,7 @@ function App() {
   return (
     <>
       <div className='chat'>
-        <h3> Join us!</h3>
+        <h1> Join us!</h1>
 
         <input type="text" placeholder='Type your name...'
           onChange={e => setUsername(e.target.value)} />
