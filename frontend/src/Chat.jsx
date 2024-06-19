@@ -1,44 +1,106 @@
 import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Icon,
+  Button,
+  Container,
+  Form,
+  Input,
+  Message,
+  Item,
+  Divider,
+} from "semantic-ui-react";
+import ScrollToBottom from 'react-scroll-to-bottom'
+
 
 const Chat = ({ socket, username, room }) => {
-    const [currentMessage, setCurrentMessage] = useState('')
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [messagesList, setMessageList] = useState([]);
 
-    const sendMessage = async () => {
-        if (username && currentMessage) {
-            const info = {
-                message: currentMessage,
-                room,
-                author: username,
-                time: new Date(Date.now()).getHours() + " " + new Date().getMinutes()
+  const sendMessage = async () => {
+    if (username && currentMessage) {
+      const info = {
+        message: currentMessage,
+        room,
+        author: username,
+        time: new Date(Date.now()).getHours() + ": " + new Date().getMinutes(),
+      };
 
-            }
-
-            await socket.emit('send_message', info)
-        }
+      await socket.emit("send_message", info);
+      setMessageList((list) => [...list, info]);
+      setCurrentMessage("")
     }
+  };
 
-    useEffect(()=> {
-        socket.on("receive_message", (data) => {
-            console.log(data)
-        })
-    }, [socket] )
+  useEffect(() => {
+    const messageHandle = (data) => {
+      setMessageList((list) => [...list, data]);
+    };
+    socket.on("receive_message", messageHandle);
 
-    return (
-        <div>
-            <section className="chat-header">
-                <p>Chat on real time</p>
-            </section>
+    return () => socket.off("receive_message", messageHandle);
+  }, [socket]);
 
-            <section id="messages"></section>
+  return (
+    <Container>
+      <Card fluid>
+        <Card.Content header={`Live Chat | Room: ${room} | User ${username}`} />
+        <ScrollToBottom>
+        <Card.Content style={{ height: "400px", padding: "10px" }} >
 
-            <section className="chat-footer">
-                <input type="text" placeholder="Message..."
-                    onChange={e => setCurrentMessage(e.target.value)}
+          {messagesList.map((item, i) => {
+            return (
+              <span key={i}>
+                <Message
+                  style={{
+                    textAlign: username === item.author ? "right" : "left",
+                  }}
+                  success={username === item.author}
+                  info={username !== item.author}
+                >
+                  <Message.Header> {item.message}</Message.Header>
+                  <p>
+                    sended by <strog>{item.author} </strog>at <i>{item.time}</i>{" "}
+                  </p>
+                </Message>
+                <Divider />
+              </span>
+            );
+          })}
+         
+        </Card.Content>
+        </ScrollToBottom>
+        <Card.Content extra>
+          <Form>
+            <Form.Field className="ui action input">
+              <div className="ui action input">
+                <input
+                value={currentMessage}
+                  type="text"
+                  placeholder="Write here ..."
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      sendMessage();
+                    }
+                  }}
                 />
-                <button onClick={sendMessage}>Send &#9658;</button>
-            </section>
-        </div>
-    )
-}
+                <button
+                  type="button"
+                  onClick={() => {
+                    sendMessage();
+                  }}
+                  className="ui teal icon right labled button"
+                >
+                  <Icon name="send" /> Enviar{" "}
+                </button>
+              </div>
+            </Form.Field>
+          </Form>
+        </Card.Content>
+      </Card>
+    </Container>
+  );
+};
 
 export default Chat;
