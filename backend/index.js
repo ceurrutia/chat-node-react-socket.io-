@@ -6,6 +6,8 @@ const { Server } = require('socket.io')
 
 app.use(cors())
 
+const PORT = 3000
+
 const server = http.createServer(app)
 
 const io = new Server(server, {
@@ -16,11 +18,11 @@ const io = new Server(server, {
 })
 
 io.on('connection', (socket) => {
-    console.log(`User now:  ${socket.id}`)
+    //console.log(`User now:  ${socket.id}`)
 
     socket.on("join_room", (data) => {
         socket.join(data)
-        console.log(`User with ID:  ${socket.id} was joined to the room: ${data}`)
+        //console.log(`User with ID:  ${socket.id} was joined to the room: ${data}`)
     })
 
     socket.on('send_message', (data) => {
@@ -29,10 +31,10 @@ io.on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
-        console.log('User disconnected', socket.id)
+        //console.log('User disconnected', socket.id)
     })
 })
 
-server.listen(3000, () => {
-    console.log('SERVER IS RUNNING')
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}` )
 })

@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import PropTypes from 'prop-types';
 import {
   Card,
   Icon,
-  Button,
   Container,
   Form,
-  Input,
   Message,
-  Item,
   Divider,
 } from "semantic-ui-react";
 import ScrollToBottom from 'react-scroll-to-bottom'
@@ -71,10 +69,10 @@ const Chat = ({ socket, username, room }) => {
         </Card.Content>
         </ScrollToBottom>
         <Card.Content extra>
-          <Form>
+          <Form fluid>
             <Form.Field className="ui action input">
               <div className="ui action input">
-                <input
+                <input 
                 value={currentMessage}
                   type="text"
                   placeholder="Write here ..."
@@ -90,7 +88,7 @@ const Chat = ({ socket, username, room }) => {
                   onClick={() => {
                     sendMessage();
                   }}
-                  className="ui teal icon right labled button"
+                  className="ui teal icon right labeled button"
                 >
                   <Icon name="send" /> Enviar{" "}
                 </button>
@@ -104,3 +102,8 @@ const Chat = ({ socket, username, room }) => {
 };
 
 export default Chat;
+Chat.propTypes = {
+  socket: PropTypes.object.isRequired,
+  username: PropTypes.string.isRequired,
+  room: PropTypes.string.isRequired,
+};
